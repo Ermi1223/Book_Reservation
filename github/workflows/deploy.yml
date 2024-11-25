@@ -1,30 +1,63 @@
-name : Test & Deploy
+name: Test & Deploy
 
 on:
   push:
     branches:
-      -main
-  pull request:
-    branches: 
-      -main  
-      
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build:
-    runs-on:ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
-     - User: actions/checkout@v3
-     - name: Set up Node.js
-      uses: action/Set up Node.js@v3
-      with:
-         node - versions: '22'
-         cache: 'npm'
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
 
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: run Tests
+      # Step 4: Run tests
+      - name: Run tests
         run: npm test
 
-      - name:  Build and Deploy
-        uses: omkartapale/react-deployment-gh-pages@v1.0.0
+      # Step 5: Build the project
+      - name: Build project
+        run: npm run build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+
+      # Step 3: Report Build Status
+      - name: Report build status
+        run: echo "Build and deployment successful!!"
+
+      # Step 4: Provide deployment link
+      - name: Deployment Link
+        run: |
+          echo "Your application has been deployed!"
+          echo "Visit: https://Ermi1223.github.io/Book_Reservation/"
