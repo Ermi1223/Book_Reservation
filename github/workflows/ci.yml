@@ -1,0 +1,69 @@
+name: CI - Continuous Integrity
+
+on:
+  # Trigger the workflow on pushes to any branch
+  push:
+    branches:
+      - '**'
+  # Trigger the workflow for pull requests
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    # Run the job on the latest Ubuntu environment
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up the Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 4: Run tests
+      - name: Run test suite
+        run: npm test
+
+      # Step 5: Upload test results (Optional)
+      # This is useful for CI reporting purposes
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test-results/ # Specify the directory where test results are stored
+
+  lint:
+    # Linting job to ensure code quality
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up the Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 4: Lint code
+      - name: Run linter
+        run: npm run lint
